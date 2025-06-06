@@ -1,0 +1,16 @@
+
+{
+  "name": "almoxarifado-smart",
+  "version": "1.0.0",
+  "description": "Sistema de Almoxarifado com Relatórios e MongoDB",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.6.1",
+    "socket.io": "^4.5.4",
+    "exceljs": "^4.3.0"
+  }
+}
