@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalhar Itens</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="logo"><img src="logo.png" alt="Logo"></div>
+  <div class="formulario-container">
+    <h1>Detalhar Itens</h1>
+    <form id="itens-form" action="/itens" method="post">
+      <p><strong>Solicitante:</strong> <span data-solicitante></span></p>
+      <p><strong>Destino:</strong>     <span data-destino></span></p>
+      <p><strong>Autorizado:</strong> <span data-autorizado></span></p>
+      <input type="hidden" name="solicitante">
+      <input type="hidden" name="destino">
+      <input type="hidden" name="autorizado">
+      <input type="hidden" name="count">
+
+      <div id="campos-itens"></div>
+      <button class="botao-adicionar" type="submit">Finalizar</button>
+    </form>
+  </div>
+
+<!-- Estilos e scripts para o Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+window.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const solicitante = params.get('solicitante');
+  const destino     = params.get('destino');
+  const autorizado  = params.get('autorizado');
+  const count       = parseInt(params.get('count'), 10);
+
+  document.querySelector('[data-solicitante]').textContent = solicitante;
+  document.querySelector('[data-destino]').textContent     = destino;
+  document.querySelector('[data-autorizado]').textContent  = autorizado;
+
+  const form = document.getElementById('itens-form');
+  form.solicitante.value = solicitante;
+  form.destino.value     = destino;
+  form.autorizado.value  = autorizado;
+  form.count.value       = count;
+
+  // Busca os insumos da API
+  let insumos = [];
+  try {
+    const res = await fetch('/api/insumos');
+    insumos = await res.json();
+  } catch (err) {
+    console.error('Erro ao buscar insumos do Sienge:', err);
+  }
+
+  const container = document.getElementById('campos-itens');
+  for (let i = 0; i < count; i++) {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <h4>Item ${i + 1}</h4>
+      <label>Descrição:</label>
+      <select class="descricao-select" name="descricao_${i}" required></select>
+
+      <label>Quantidade:</label><input name="quantidade_${i}" required>
+      <label>Unidade:</label><input name="unidade_${i}" required>
+      <label>Tipo:</label>
+        <select name="tipo_${i}">
+          <option value="material">Material</option>
+          <option value="equipamento">Equipamento</option>
+        </select>
+      <hr>
+    `;
+    container.appendChild(div);
+  }
+
+  // Popular selects com insumos e aplicar Select2
+  document.querySelectorAll('.descricao-select').forEach(select => {
+    insumos.forEach(insumo => {
+      const opt = document.createElement('option');
+      opt.value = insumo.id;
+      opt.textContent = insumo.text;
+      select.appendChild(opt);
+    });
+    $(select).select2({ width: '100%', placeholder: 'Selecione um insumo...' });
+  });
+});
+
+document.getElementById('itens-form').addEventListener('submit', function (e) {
+  console.log('🔀 Submetendo form itens...');
+  const obj = {};
+  new FormData(this).forEach((v, k) => obj[k] = v);
+  console.log('👉 FormData =', obj);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Nova Solicitação</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="logo">
+    <img src="logo.png" alt="Logo" />
+  </div>
+
+  <div class="formulario-container">
+    <h1>Início da Solicitação</h1>
+    <form action="itens.html" method="get">
+      <label>Nome do Solicitante:</label>
+      <input type="text" name="solicitante" required />
+
+      <label>Local para Utilização:</label>
+      <input type="text" name="destino" required />
+
+      <label>Autorizado Por:</label>
+      <input type="text" name="autorizado" required />
+
+      <label>Número de Itens:</label>
+      <input
+        type="number"
+        name="count"
+        min="1"
+        value="1"
+        required
+      />
+
+      <button class="botao-adicionar" type="submit">
+        Próximo
+      </button>
+    </form>
+  </div>
+</body>
+</html>

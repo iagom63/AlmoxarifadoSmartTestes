@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Geração de Relatórios</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="report-container">
+        <h1>Geração de Relatórios</h1>
+
+        <!-- Formulário para Filtro -->
+        <div class="filter-section">
+            <label for="startDate">Data Inicial:</label>
+            <input type="date" id="startDate">
+
+            <label for="endDate">Data Final:</label>
+            <input type="date" id="endDate">
+
+            <label for="reportType">Tipo de Relatório:</label>
+            <select id="reportType">
+                <option value="saida">Saídas</option>
+                <option value="entrada">Entradas</option>
+                <option value="estoque">Estoque</option>
+            </select>
+
+            <button onclick="generateReport()">Gerar Relatório</button>
+        </div>
+
+        <!-- Botão para Relatório do Dia -->
+        <div class="actions">
+            <button onclick="generateTodayReport()">Relatório do Dia</button>
+            <button onclick="exportReport()">Exportar PDF</button>
+            <button onclick="viewReports()">Visualizar Relatórios</button>
+        </div>
+
+        <!-- Tabela de Relatórios -->
+        <table id="reportTable">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Total de Registros</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Relatórios serão listados aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

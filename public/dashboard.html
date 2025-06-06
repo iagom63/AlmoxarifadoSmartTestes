@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard de Saída</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="logo"><img src="logo.png" alt="Logo"></div>
+  <h1>Dashboard de Saída</h1>
+  <div class="columns-container">
+    <div class="list-column">
+      <h3>Materiais</h3>
+      <ul id="lista-materiais"></ul>
+    </div>
+    <div class="list-column">
+      <h3>Equipamentos</h3>
+      <ul id="lista-equipamentos"></ul>
+    </div>
+  </div>
+  <button id="exportar-relatorio" class="botao-exportar">Exportar Relatório Do Dia</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function renderDashboard(data) {
+      console.log('📋 renderDashboard recebeu:', data);
+      const mat = document.getElementById('lista-materiais');
+      const eqp = document.getElementById('lista-equipamentos');
+      mat.innerHTML = '';
+      eqp.innerHTML = '';
+
+      // Materiais
+      data.filter(i => i.tipo === 'material')
+          .forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${item.nome}</strong> – ${item.descricao} (${item.quantidade} ${item.unidade})<br>
+            <em>Autorizado por:</em> ${item.responsavel}<br>
+            <em>Hora:</em> ${new Date(item.timestamp).toLocaleTimeString()}<br>
+            <em>Data:</em> ${new Date(item.timestamp).toLocaleDateString()}`;
+            const btn = document.createElement('button');
+            btn.textContent = 'Remover';
+            btn.onclick = () => fetch(`/remover/${item._id}`, { method: 'POST' });
+            li.appendChild(btn);
+            mat.appendChild(li);
+          });
+
+      // Equipamentos: não-devolvidos primeiro, depois devolvidos
+      const equipamentos  = data.filter(i => i.tipo === 'equipamento');
+      const naoDevolvidos = equipamentos.filter(i => !i.delivered);
+      const devolvidos    = equipamentos.filter(i => i.delivered);
+
+      naoDevolvidos.concat(devolvidos).forEach(item => {
+        const li = document.createElement('li');
+        if (item.delivered) li.style.opacity = '0.6';
+
+        const chk = document.createElement('input');
+        chk.type    = 'checkbox';
+        chk.checked = item.delivered;
+        chk.onchange = () => fetch(`/reordenar/${item._id}`, { method: 'POST' });
+
+        const span = document.createElement('span');
+        span.innerHTML = `<strong>${item.nome}</strong> – ${item.descricao} (${item.quantidade} ${item.unidade})<br>
+        <em>Autorizado por:</em> ${item.responsavel}<br>
+        <em>Hora:</em> ${new Date(item.timestamp).toLocaleTimeString()}<br>
+        <em>Data:</em> ${new Date(item.timestamp).toLocaleDateString()}`;
+
+        const btnDev = document.createElement('button');
+        btnDev.textContent = 'Devolvido';
+        btnDev.onclick = () => fetch(`/remover/${item._id}`, { method: 'POST' });
+
+        li.appendChild(chk);
+        li.appendChild(span);
+        li.appendChild(btnDev);
+        eqp.appendChild(li);
+      });
+    }
+
+    function atualizarDashboard() {
+      fetch('/api/saidas')
+        .then(r => r.json())
+        .then(renderDashboard)
+        .catch(err => console.error('❌ Erro no fetch /api/saidas:', err));
+    }
+
+    socket.on('update', () => {
+      console.log('🔔 update via socket recebido');
+      atualizarDashboard();
+    });
+
+    document.getElementById('exportar-relatorio')
+      .addEventListener('click', () => window.location.href = '/exportar-relatorio');
+
+    // Inicial
+    atualizarDashboard();
+  </script>
+</body>
+</html>
