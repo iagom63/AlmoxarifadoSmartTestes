@@ -18,12 +18,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // ─── Conexão MongoDB ────────────────────────────────────────────────────────────
 mongoose.connect(
-  'mongodb+srv://gestaoqualidade:eqAFXxo6Y6wUUSQE@almoxarifadosmartmyway.m2fofld.mongodb.net/AlmoxarifadoSmartMyWay?retryWrites=true&w=majority&appName=ALmoxarifadoSmartMyWay',
+  'mongodb+srv://iago:%40lm%4000810262428@teste.6vwjzp.mongodb.net/Teste?retryWrites=true&w=majority&appName=Teste',
   { useNewUrlParser: true, useUnifiedTopology: true }
 );
 mongoose.connection.on('error', err => console.error('❌ MongoDB error:', err));
-mongoose.connection.once('open', () => console.log('✅ MongoDB conectado ao banco AlmoxarifadoSmartMyWay!'));
-
+mongoose.connection.once('open', () => console.log('✅ MongoDB conectado'));
 // ─── Schema & Model ─────────────────────────────────────────────────────────────
 const saidaSchema = new mongoose.Schema({
   nome: String,
