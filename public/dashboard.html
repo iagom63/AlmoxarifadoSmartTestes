@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+
+
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -20,7 +22,10 @@
   </div>
   <button id="exportar-relatorio" class="botao-exportar">Exportar Relatório Do Dia</button>
 
+
   <script src="/socket.io/socket.io.js"></script>
+
+
   <script>
     const socket = io();
 
@@ -32,47 +37,67 @@
       eqp.innerHTML = '';
 
       // Materiais
-      data.filter(i => i.tipo === 'material')
+      data.filter(item => item.tipo === 'material')
           .forEach(item => {
             const li = document.createElement('li');
-            li.innerHTML = `<strong>${item.nome}</strong> – ${item.descricao} (${item.quantidade} ${item.unidade})<br>
-            <em>Autorizado por:</em> ${item.responsavel}<br>
-            <em>Hora:</em> ${new Date(item.timestamp).toLocaleTimeString()}<br>
-            <em>Data:</em> ${new Date(item.timestamp).toLocaleDateString()}`;
-            const btn = document.createElement('button');
-            btn.textContent = 'Remover';
-            btn.onclick = () => fetch(`/remover/${item._id}`, { method: 'POST' });
-            li.appendChild(btn);
+            li.innerHTML = `
+              <strong>${item.nome}</strong> – ${item.descricao} (${item.quantidade} ${item.unidade})<br>
+              <em>Autorizado por:</em> ${item.responsavel}<br>
+              <em>Hora:</em> ${new Date(item.timestamp).toLocaleTimeString()}<br>
+              <em>Data:</em> ${new Date(item.timestamp).toLocaleDateString()}`;
+
+            // Botão Remover
+            const btnRemover = document.createElement('button');
+            btnRemover.textContent = 'Remover';
+            btnRemover.onclick = () => fetch(`/remover/${item._id}`, { method: 'POST' });
+            li.appendChild(btnRemover);
+
+            // Botão Descontinuado
+            const btnDesc = document.createElement('button');
+            btnDesc.textContent = 'Descontinuado';
+            btnDesc.onclick = () => fetch(`/descontinuar/${item._id}`, { method: 'POST' });
+            li.appendChild(btnDesc);
+
             mat.appendChild(li);
           });
 
       // Equipamentos: não-devolvidos primeiro, depois devolvidos
-      const equipamentos  = data.filter(i => i.tipo === 'equipamento');
-      const naoDevolvidos = equipamentos.filter(i => !i.delivered);
-      const devolvidos    = equipamentos.filter(i => i.delivered);
+      const equipamentos  = data.filter(item => item.tipo === 'equipamento');
+      const naoDevolvidos = equipamentos.filter(item => !item.delivered);
+      const devolvidos    = equipamentos.filter(item => item.delivered);
 
       naoDevolvidos.concat(devolvidos).forEach(item => {
         const li = document.createElement('li');
         if (item.delivered) li.style.opacity = '0.6';
 
+        // Checkbox Devolvido
         const chk = document.createElement('input');
         chk.type    = 'checkbox';
         chk.checked = item.delivered;
         chk.onchange = () => fetch(`/reordenar/${item._id}`, { method: 'POST' });
+        li.appendChild(chk);
 
+        // Conteúdo
         const span = document.createElement('span');
-        span.innerHTML = `<strong>${item.nome}</strong> – ${item.descricao} (${item.quantidade} ${item.unidade})<br>
-        <em>Autorizado por:</em> ${item.responsavel}<br>
-        <em>Hora:</em> ${new Date(item.timestamp).toLocaleTimeString()}<br>
-        <em>Data:</em> ${new Date(item.timestamp).toLocaleDateString()}`;
+        span.innerHTML = `
+          <strong>${item.nome}</strong> – ${item.descricao} (${item.quantidade} ${item.unidade})<br>
+          <em>Autorizado por:</em> ${item.responsavel}<br>
+          <em>Hora:</em> ${new Date(item.timestamp).toLocaleTimeString()}<br>
+          <em>Data:</em> ${new Date(item.timestamp).toLocaleDateString()}`;
+        li.appendChild(span);
 
+        // Botão Devolvido
         const btnDev = document.createElement('button');
         btnDev.textContent = 'Devolvido';
         btnDev.onclick = () => fetch(`/remover/${item._id}`, { method: 'POST' });
-
-        li.appendChild(chk);
-        li.appendChild(span);
         li.appendChild(btnDev);
+
+        // Botão Descontinuado
+        const btnDescEq = document.createElement('button');
+        btnDescEq.textContent = 'Descontinuado';
+        btnDescEq.onclick = () => fetch(`/descontinuar/${item._id}`, { method: 'POST' });
+        li.appendChild(btnDescEq);
+
         eqp.appendChild(li);
       });
     }
@@ -84,10 +109,7 @@
         .catch(err => console.error('❌ Erro no fetch /api/saidas:', err));
     }
 
-    socket.on('update', () => {
-      console.log('🔔 update via socket recebido');
-      atualizarDashboard();
-    });
+    socket.on('update', () => atualizarDashboard());
 
     document.getElementById('exportar-relatorio')
       .addEventListener('click', () => window.location.href = '/exportar-relatorio');
@@ -95,5 +117,7 @@
     // Inicial
     atualizarDashboard();
   </script>
+
+
 </body>
 </html>
