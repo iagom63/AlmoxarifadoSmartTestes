@@ -16,9 +16,8 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ─── Conexão MongoDB ────────────────────────────────────────────────────────────
 mongoose.connect(
-  'mongodb+srv://ambientetestes63:JFbkt6dFlkgyJV9j@teste.tmub42r.mongodb.net/Teste?retryWrites=true&w=majority&appName=Teste',
+  'mongodb+srv://ambientetestes63:ANf3MkSuQq9Fs2Gf@teste.tmub42r.mongodb.net/Teste?retryWrites=true&w=majority&appName=Teste',
   { useNewUrlParser: true, useUnifiedTopology: true }
 );
 mongoose.connection.on('error', err => console.error('❌ MongoDB error:', err));
